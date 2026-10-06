@@ -64,6 +64,16 @@ service cloud.firestore {
       allow write: if true;
     }
 
+    match /system_settings/{settingId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    match /system/{systemId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
     match /test/{testId} {
       allow read, write: if true;
     }

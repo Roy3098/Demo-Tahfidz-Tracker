@@ -37,7 +37,8 @@ import {
   INITIAL_GROUPS,
   INITIAL_TARGETS,
   INITIAL_SESSIONS,
-  INITIAL_SANTRI
+  INITIAL_SANTRI,
+  DEMO_ACCOUNTS
 } from '../data/initialData';
 
 const INITIAL_TASMI: TasmiRecord[] = [
@@ -505,11 +506,22 @@ export const TahfidzProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [userAccounts, setUserAccounts] = useState<UserAccount[]>(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEYS.ACCOUNTS);
-      if (saved) return JSON.parse(saved);
+      if (saved) {
+        const parsed: UserAccount[] = JSON.parse(saved);
+        if (Array.isArray(parsed)) {
+          const merged = [...parsed];
+          DEMO_ACCOUNTS.forEach(demo => {
+            if (!merged.some(u => u.id === demo.id || u.username === demo.username || u.email === demo.email)) {
+              merged.push(demo);
+            }
+          });
+          return merged;
+        }
+      }
     } catch (e) {
       console.error(e);
     }
-    return [];
+    return DEMO_ACCOUNTS;
   });
 
   const [deletedUserIds, setDeletedUserIds] = useState<string[]>(() => {
@@ -680,7 +692,14 @@ export const TahfidzProvider: React.FC<{ children: React.ReactNode }> = ({ child
         snapshot.forEach(docSnap => {
           list.push({ ...(docSnap.data() as UserAccount), id: docSnap.id });
         });
-        setUserAccounts(list);
+        const merged = [...list];
+        DEMO_ACCOUNTS.forEach(demo => {
+          if (!merged.some(u => u.id === demo.id || u.username === demo.username || u.email === demo.email)) {
+            merged.push(demo);
+            setDoc(doc(db, 'users', demo.id), cleanForFirestore(demo)).catch(() => {});
+          }
+        });
+        setUserAccounts(merged);
       },
       error => {
         handleFirestoreError(error, OperationType.LIST, 'users');
@@ -1013,6 +1032,73 @@ export const TahfidzProvider: React.FC<{ children: React.ReactNode }> = ({ child
         };
       } else {
         return { success: false, message: 'Username atau password yang dimasukkan salah.' };
+      }
+    }
+
+    // Built-in Demo Guru Role
+    if (
+      cleanId === 'guru' ||
+      cleanId === 'guru_demo' ||
+      cleanId === 'guru@demo.id' ||
+      cleanId === 'ustadz'
+    ) {
+      if (password === 'guru123') {
+        const demoAcc = DEMO_ACCOUNTS.find(a => a.id === 'demo-guru');
+        const safeUser: User = {
+          id: demoAcc?.id || 'demo-guru',
+          name: demoAcc?.name || 'Ustadz Ahmad Fauzan, S.Pd.I',
+          username: demoAcc?.username || 'guru',
+          email: demoAcc?.email || 'guru@demo.id',
+          role: 'guru',
+          phone: demoAcc?.phone || '081234567801'
+        };
+        login(safeUser);
+        addSystemLog('Login Demo Guru', 'AUTH', 'Login berhasil dengan Akun Demo Guru (Ustadz Ahmad Fauzan)');
+        return {
+          success: true,
+          message: 'Login Akun Demo Guru berhasil! Selamat datang, Ustadz.',
+          user: safeUser
+        };
+      } else {
+        return { success: false, message: 'Password akun demo guru salah. Gunakan password: guru123' };
+      }
+    }
+
+    // Built-in Demo Orang Tua / Wali Santri Role
+    if (
+      cleanId === 'orangtua' ||
+      cleanId === 'ortu' ||
+      cleanId === 'wali' ||
+      cleanId === 'ortu@demo.id' ||
+      cleanId === 'orangtua@demo.id'
+    ) {
+      if (password === 'ortu123' || password === 'orangtua123') {
+        const primaryStudent = santriList.find(s => s.id === 's-1') || santriList[0];
+        const secondStudent = santriList.find(s => s.id === 's-4') || santriList[1];
+        const studentIds = [primaryStudent?.id, secondStudent?.id].filter(Boolean) as string[];
+        const studentNames = [primaryStudent?.nama, secondStudent?.nama].filter(Boolean) as string[];
+
+        const safeUser: User = {
+          id: 'demo-parent',
+          name: 'Bapak Ahmad (Wali Santri)',
+          username: 'orangtua',
+          email: 'ortu@demo.id',
+          role: 'parent',
+          studentId: primaryStudent?.id,
+          studentName: primaryStudent?.nama,
+          studentIds: studentIds,
+          studentNames: studentNames,
+          phone: '081234567890'
+        };
+        login(safeUser);
+        addSystemLog('Login Demo Orang Tua', 'AUTH', 'Login berhasil dengan Akun Demo Orang Tua (Bapak Ahmad)');
+        return {
+          success: true,
+          message: 'Login Akun Demo Orang Tua berhasil! Selamat datang, Bapak/Ibu.',
+          user: safeUser
+        };
+      } else {
+        return { success: false, message: 'Password akun demo orang tua salah. Gunakan password: ortu123' };
       }
     }
 

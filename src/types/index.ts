@@ -33,6 +33,8 @@ export interface HafalanEntry {
   juz: number;
   surahNumber?: number;
   surahName: string;
+  surahSampaiNumber?: number;
+  surahSampaiName?: string;
   ayatMulai?: number;
   ayatSelesai?: number;
   lembar?: number;

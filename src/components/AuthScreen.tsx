@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useTahfidz } from '../context/TahfidzContext';
-import { BookOpen, ShieldCheck, HeartHandshake, UserPlus, ArrowLeft, CheckCircle2, AlertCircle, LogIn, Lock, Mail, User as UserIcon, Phone, Search, Check, X, Users } from 'lucide-react';
+import { BookOpen, ShieldCheck, HeartHandshake, UserPlus, ArrowLeft, CheckCircle2, AlertCircle, LogIn, Lock, Mail, User as UserIcon, Phone, Search, Check, X, Users, Sparkles, GraduationCap, ChevronDown, ChevronUp } from 'lucide-react';
 import { Role } from '../types';
 
 export const AuthScreen: React.FC = () => {
@@ -8,6 +8,7 @@ export const AuthScreen: React.FC = () => {
 
   type ViewMode = 'selection' | 'guru-login' | 'parent-login' | 'guru-register' | 'parent-register';
   const [view, setView] = useState<ViewMode>('selection');
+  const [showManualLogin, setShowManualLogin] = useState(false);
 
   // Login form state
   const [loginIdentifier, setLoginIdentifier] = useState('');
@@ -41,6 +42,38 @@ export const AuthScreen: React.FC = () => {
     setLoginError('');
     setRegError('');
     setRegSuccess('');
+  };
+
+  const handleDemoGuruLogin = async () => {
+    setIsSubmitting(true);
+    setLoginError('');
+    const res = await loginUserAccount('guru', 'guru123', 'guru');
+    setIsSubmitting(false);
+    if (!res.success) {
+      setLoginError(res.message);
+    }
+  };
+
+  const handleDemoParentLogin = async () => {
+    setIsSubmitting(true);
+    setLoginError('');
+    const res = await loginUserAccount('orangtua', 'ortu123', 'parent');
+    setIsSubmitting(false);
+    if (!res.success) {
+      setLoginError(res.message);
+    }
+  };
+
+  const handleFillDemoGuru = () => {
+    setLoginIdentifier('guru');
+    setLoginPassword('guru123');
+    setLoginError('');
+  };
+
+  const handleFillDemoParent = () => {
+    setLoginIdentifier('orangtua');
+    setLoginPassword('ortu123');
+    setLoginError('');
   };
 
   const handleGuruLogin = async (e: React.FormEvent) => {
@@ -200,58 +233,146 @@ export const AuthScreen: React.FC = () => {
         {/* VIEW: Selection */}
         {view === 'selection' && (
           <div className="space-y-4">
-            <button
-              onClick={() => changeView('guru-login')}
-              className="w-full flex items-center justify-between p-4 bg-white/15 hover:bg-white/25 border border-white/25 rounded-2xl transition-all duration-200 text-left group"
-            >
-              <div className="flex items-center gap-3">
-                <div className="w-11 h-11 rounded-xl bg-emerald-500/30 flex items-center justify-center text-emerald-200 shadow-sm">
-                  <ShieldCheck className="w-6 h-6" />
-                </div>
-                <div>
-                  <div className="font-semibold text-white text-base">Masuk Sebagai Guru / Asatidz</div>
-                  <div className="text-xs text-emerald-100/80">Kelola santri, setoran hafalan, & absensi halaqah</div>
-                </div>
+            {loginError && (
+              <div className="p-3 bg-rose-500/25 border border-rose-400/40 rounded-xl text-xs text-rose-100 flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 text-rose-300 shrink-0" />
+                <span>{loginError}</span>
               </div>
-              <span className="text-emerald-300 group-hover:translate-x-1 transition-transform font-bold">→</span>
+            )}
+
+            <div className="text-center pb-0.5">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-200 border border-emerald-400/30 text-xs font-semibold">
+                <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+                Pilih Akun Demo untuk Masuk Langsung
+              </span>
+            </div>
+
+            {/* Demo Guru Card */}
+            <button
+              type="button"
+              onClick={handleDemoGuruLogin}
+              disabled={isSubmitting}
+              className="w-full p-4 bg-white/15 hover:bg-white/25 border border-emerald-400/40 rounded-2xl transition-all duration-200 text-left group cursor-pointer shadow-md hover:scale-[1.01] active:scale-[0.99]"
+            >
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-xl bg-emerald-500/30 border border-emerald-400/40 flex items-center justify-center text-emerald-200 shadow-sm shrink-0">
+                    <GraduationCap className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold text-white text-base">Masuk Sebagai Guru</span>
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-400/20 text-emerald-300 border border-emerald-400/30">
+                        Demo
+                      </span>
+                    </div>
+                    <div className="text-xs text-emerald-100/90 font-medium mt-0.5">
+                      Ustadz Ahmad Fauzan, S.Pd.I
+                    </div>
+                    <div className="text-[11px] text-emerald-200/70 font-mono mt-0.5">
+                      User: guru · Sandi: guru123
+                    </div>
+                  </div>
+                </div>
+                <span className="text-emerald-300 group-hover:translate-x-1 transition-transform font-bold text-lg">→</span>
+              </div>
             </button>
 
+            {/* Demo Orang Tua Card */}
             <button
-              onClick={() => changeView('parent-login')}
-              className="w-full flex items-center justify-between p-4 bg-white/15 hover:bg-white/25 border border-white/25 rounded-2xl transition-all duration-200 text-left group"
+              type="button"
+              onClick={handleDemoParentLogin}
+              disabled={isSubmitting}
+              className="w-full p-4 bg-white/15 hover:bg-white/25 border border-teal-400/40 rounded-2xl transition-all duration-200 text-left group cursor-pointer shadow-md hover:scale-[1.01] active:scale-[0.99]"
             >
-              <div className="flex items-center gap-3">
-                <div className="w-11 h-11 rounded-xl bg-teal-500/30 flex items-center justify-center text-teal-200 shadow-sm">
-                  <HeartHandshake className="w-6 h-6" />
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-xl bg-teal-500/30 border border-teal-400/40 flex items-center justify-center text-teal-200 shadow-sm shrink-0">
+                    <HeartHandshake className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold text-white text-base">Masuk Sebagai Wali Santri</span>
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-teal-400/20 text-teal-300 border border-teal-400/30">
+                        Demo
+                      </span>
+                    </div>
+                    <div className="text-xs text-teal-100/90 font-medium mt-0.5">
+                      Bapak Ahmad (Wali Ahmad Fauzi)
+                    </div>
+                    <div className="text-[11px] text-teal-200/70 font-mono mt-0.5">
+                      User: orangtua · Sandi: ortu123
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <div className="font-semibold text-white text-base">Masuk Sebagai Wali Santri</div>
-                  <div className="text-xs text-emerald-100/80">Pantau perkembangan mutqin & kehadiran ananda</div>
-                </div>
+                <span className="text-teal-300 group-hover:translate-x-1 transition-transform font-bold text-lg">→</span>
               </div>
-              <span className="text-emerald-300 group-hover:translate-x-1 transition-transform font-bold">→</span>
             </button>
 
-            <div className="pt-4 border-t border-white/15">
-              <div className="text-xs text-center text-emerald-100/90 font-medium mb-3">
-                Belum memiliki akun terdaftar?
-              </div>
-              <div className="grid grid-cols-2 gap-2.5">
+            {/* Collapsible / Hidden Manual Login Section */}
+            <div className="pt-2">
+              <div className="text-center">
                 <button
-                  onClick={() => changeView('guru-register')}
-                  className="py-2.5 px-3 bg-white/15 hover:bg-white/25 border border-white/25 rounded-xl text-xs font-semibold text-white flex items-center justify-center gap-1.5 transition-colors"
+                  type="button"
+                  onClick={() => setShowManualLogin(prev => !prev)}
+                  className="text-xs text-white/50 hover:text-white/80 transition-colors inline-flex items-center gap-1.5 py-1 px-2.5 rounded-lg hover:bg-white/5 cursor-pointer"
                 >
-                  <UserPlus className="w-4 h-4 text-emerald-300" />
-                  Daftar Guru / Admin
-                </button>
-                <button
-                  onClick={() => changeView('parent-register')}
-                  className="py-2.5 px-3 bg-white/15 hover:bg-white/25 border border-white/25 rounded-xl text-xs font-semibold text-white flex items-center justify-center gap-1.5 transition-colors"
-                >
-                  <UserPlus className="w-4 h-4 text-teal-300" />
-                  Daftar Wali Santri
+                  <span>{showManualLogin ? 'Sembunyikan opsi masuk manual' : 'Opsi masuk manual'}</span>
+                  {showManualLogin ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
                 </button>
               </div>
+
+              {showManualLogin && (
+                <div className="mt-3 pt-3 border-t border-white/15 space-y-3 animate-in fade-in duration-200">
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      onClick={() => changeView('guru-login')}
+                      className="p-3 bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl text-xs font-semibold text-white flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                    >
+                      <ShieldCheck className="w-4 h-4 text-emerald-300" />
+                      Form Login Guru
+                    </button>
+                    <button
+                      onClick={() => changeView('parent-login')}
+                      className="p-3 bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl text-xs font-semibold text-white flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                    >
+                      <Users className="w-4 h-4 text-teal-300" />
+                      Form Login Ortu
+                    </button>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      onClick={() => changeView('guru-register')}
+                      className="py-2 px-2.5 bg-white/5 hover:bg-white/15 border border-white/15 rounded-xl text-[11px] font-medium text-emerald-200 flex items-center justify-center gap-1 transition-colors cursor-pointer"
+                    >
+                      <UserPlus className="w-3.5 h-3.5" />
+                      Daftar Akun Guru
+                    </button>
+                    <button
+                      onClick={() => changeView('parent-register')}
+                      className="py-2 px-2.5 bg-white/5 hover:bg-white/15 border border-white/15 rounded-xl text-[11px] font-medium text-teal-200 flex items-center justify-center gap-1 transition-colors cursor-pointer"
+                    >
+                      <UserPlus className="w-3.5 h-3.5" />
+                      Daftar Akun Wali
+                    </button>
+                  </div>
+
+                  <div className="text-center pt-1">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        changeView('guru-login');
+                        setLoginIdentifier('AdminBr');
+                        setLoginPassword('adminbr123');
+                      }}
+                      className="text-[11px] text-white/40 hover:text-white/70 transition-colors underline underline-offset-2 cursor-pointer"
+                    >
+                      Masuk sebagai Super Admin (AdminBr)
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -279,6 +400,35 @@ export const AuthScreen: React.FC = () => {
               </button>
             </div>
 
+            {/* Quick Demo Helper for Guru */}
+            <div className="p-3 rounded-xl bg-emerald-500/20 border border-emerald-400/30 text-xs flex items-center justify-between gap-2 shadow-xs">
+              <div className="min-w-0">
+                <div className="font-semibold text-emerald-200 flex items-center gap-1 text-xs">
+                  <Sparkles className="w-3.5 h-3.5 text-amber-300 shrink-0" /> Akun Demo Guru
+                </div>
+                <div className="text-[11px] text-emerald-100/90 font-mono mt-0.5">
+                  User: <strong>guru</strong> · Pass: <strong>guru123</strong>
+                </div>
+              </div>
+              <div className="flex items-center gap-1.5 shrink-0">
+                <button
+                  type="button"
+                  onClick={handleFillDemoGuru}
+                  className="px-2 py-1 bg-white/15 hover:bg-white/25 text-white rounded-lg text-[11px] font-medium transition-colors"
+                >
+                  Isi Form
+                </button>
+                <button
+                  type="button"
+                  onClick={handleDemoGuruLogin}
+                  disabled={isSubmitting}
+                  className="px-2.5 py-1 bg-emerald-400 hover:bg-emerald-300 text-slate-950 font-bold rounded-lg text-[11px] transition-colors shadow-xs"
+                >
+                  Masuk Demo
+                </button>
+              </div>
+            </div>
+
             {loginError && (
               <div className="p-3 bg-rose-500/25 border border-rose-400/40 rounded-xl text-xs text-rose-100 flex items-center gap-2">
                 <AlertCircle className="w-4 h-4 text-rose-300 shrink-0" />
@@ -296,7 +446,7 @@ export const AuthScreen: React.FC = () => {
                 onChange={e => setLoginIdentifier(e.target.value)}
                 required
                 className="w-full px-3.5 py-2.5 bg-white/15 border border-white/25 rounded-xl text-white placeholder-white/50 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400"
-                placeholder="Masukkan username atau email"
+                placeholder="Contoh: guru atau email anda"
               />
             </div>
 
@@ -317,7 +467,7 @@ export const AuthScreen: React.FC = () => {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full py-3 bg-emerald-500 hover:bg-emerald-600 disabled:opacity-50 text-slate-950 font-bold rounded-xl shadow-lg transition-all text-sm mt-3 flex items-center justify-center gap-2"
+              className="w-full py-3 bg-emerald-500 hover:bg-emerald-600 disabled:opacity-50 text-slate-950 font-bold rounded-xl shadow-lg transition-all text-sm mt-3 flex items-center justify-center gap-2 cursor-pointer"
             >
               <LogIn className="w-4 h-4" />
               {isSubmitting ? 'Memeriksa Akun...' : 'Masuk Sekarang'}
@@ -348,6 +498,35 @@ export const AuthScreen: React.FC = () => {
               </button>
             </div>
 
+            {/* Quick Demo Helper for Orang Tua */}
+            <div className="p-3 rounded-xl bg-teal-500/20 border border-teal-400/30 text-xs flex items-center justify-between gap-2 shadow-xs">
+              <div className="min-w-0">
+                <div className="font-semibold text-teal-200 flex items-center gap-1 text-xs">
+                  <Sparkles className="w-3.5 h-3.5 text-amber-300 shrink-0" /> Akun Demo Orang Tua
+                </div>
+                <div className="text-[11px] text-teal-100/90 font-mono mt-0.5">
+                  User: <strong>orangtua</strong> · Pass: <strong>ortu123</strong>
+                </div>
+              </div>
+              <div className="flex items-center gap-1.5 shrink-0">
+                <button
+                  type="button"
+                  onClick={handleFillDemoParent}
+                  className="px-2 py-1 bg-white/15 hover:bg-white/25 text-white rounded-lg text-[11px] font-medium transition-colors"
+                >
+                  Isi Form
+                </button>
+                <button
+                  type="button"
+                  onClick={handleDemoParentLogin}
+                  disabled={isSubmitting}
+                  className="px-2.5 py-1 bg-teal-400 hover:bg-teal-300 text-slate-950 font-bold rounded-lg text-[11px] transition-colors shadow-xs"
+                >
+                  Masuk Demo
+                </button>
+              </div>
+            </div>
+
             {loginError && (
               <div className="p-3 bg-rose-500/25 border border-rose-400/40 rounded-xl text-xs text-rose-100 flex items-center gap-2">
                 <AlertCircle className="w-4 h-4 text-rose-300 shrink-0" />
@@ -365,7 +544,7 @@ export const AuthScreen: React.FC = () => {
                 onChange={e => setLoginIdentifier(e.target.value)}
                 required
                 className="w-full px-3.5 py-2.5 bg-white/15 border border-white/25 rounded-xl text-white placeholder-white/50 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400"
-                placeholder="Masukkan email atau username"
+                placeholder="Contoh: orangtua atau email anda"
               />
             </div>
 
@@ -386,7 +565,7 @@ export const AuthScreen: React.FC = () => {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full py-3 bg-teal-400 hover:bg-teal-500 disabled:opacity-50 text-slate-950 font-bold rounded-xl shadow-lg transition-all text-sm mt-3 flex items-center justify-center gap-2"
+              className="w-full py-3 bg-teal-400 hover:bg-teal-500 disabled:opacity-50 text-slate-950 font-bold rounded-xl shadow-lg transition-all text-sm mt-3 flex items-center justify-center gap-2 cursor-pointer"
             >
               <LogIn className="w-4 h-4" />
               {isSubmitting ? 'Memverifikasi...' : 'Masuk Pantau Santri'}

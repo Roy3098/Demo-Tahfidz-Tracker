@@ -2277,7 +2277,14 @@ export const KelolaDataView: React.FC = () => {
                       .map(u => (
                         <tr key={u.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-colors">
                           <td className="py-3 px-3">
-                            <div className="font-bold text-slate-800 dark:text-slate-200">{u.name}</div>
+                            <div className="font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+                              <span>{u.name}</span>
+                              {u.id.startsWith('demo-') && (
+                                <span className="px-1.5 py-0.2 rounded text-[10px] bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 font-bold border border-emerald-300 dark:border-emerald-800">
+                                  Akun Demo
+                                </span>
+                              )}
+                            </div>
                             {((u.studentNames && u.studentNames.length > 0) || u.studentName) && (
                               <div className="text-[10px] text-slate-500 dark:text-slate-400 flex flex-wrap items-center gap-1.5 mt-0.5">
                                 <span>Wali dari:</span>

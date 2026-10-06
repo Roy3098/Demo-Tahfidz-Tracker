@@ -1,4 +1,31 @@
-import { Santri, Kelas, Kelompok, TargetHafalan, SesiTahfidz, TasmiRecord, AttendanceRecord } from '../types';
+import { Santri, Kelas, Kelompok, TargetHafalan, SesiTahfidz, TasmiRecord, AttendanceRecord, UserAccount } from '../types';
+
+export const DEMO_ACCOUNTS: UserAccount[] = [
+  {
+    id: 'demo-guru',
+    name: 'Ustadz Ahmad Fauzan, S.Pd.I',
+    username: 'guru',
+    email: 'guru@demo.id',
+    password: 'guru123',
+    role: 'guru',
+    phone: '081234567801',
+    createdAt: '2026-01-01T00:00:00.000Z'
+  },
+  {
+    id: 'demo-parent',
+    name: 'Bapak Ahmad (Wali Santri)',
+    username: 'orangtua',
+    email: 'ortu@demo.id',
+    password: 'ortu123',
+    role: 'parent',
+    studentId: 's-1',
+    studentName: 'Ahmad Fauzi',
+    studentIds: ['s-1', 's-4'],
+    studentNames: ['Ahmad Fauzi', 'Muhammad Rizki'],
+    phone: '081234567890',
+    createdAt: '2026-01-01T00:00:00.000Z'
+  }
+];
 
 export const INITIAL_CLASSES: Kelas[] = [
   { id: 'c1', nama: 'Kelas 1', tingkat: 'Ibtidaiyyah', waliKelas: 'Ustadzah Aisyah' },
